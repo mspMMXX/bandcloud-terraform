@@ -20,6 +20,7 @@ app_settings = {
   STORAGE_CONTAINER    = azurerm_storage_container.recordings.name
   SQL_SERVER           = azurerm_mssql_server.sql_server.fully_qualified_domain_name
   SQL_DATABASE         = azurerm_mssql_database.db.name
+  ConnectionStrings__DefaultConnection = "Server=tcp:${azurerm_mssql_server.sql_server.fully_qualified_domain_name},1433;Database=${azurerm_mssql_database.db.name};User Id=${var.sql_admin_username};Password=${var.sql_admin_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 }
 
 
