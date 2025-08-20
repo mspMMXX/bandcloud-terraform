@@ -1,3 +1,4 @@
+# Zufälliger Suffix für eindeutigen SQL-Servernamen
 resource "random_string" "sql_suffix" {
   length  = 8
   upper   = false
@@ -6,8 +7,9 @@ resource "random_string" "sql_suffix" {
   special = false
 }
 
+# Azure SQL Server (Basisressource für Datenbank)
 resource "azurerm_mssql_server" "sql_server" {
-  name                         = "bcsqlserver${random_string.sql_suffix.result}"
+  name                         = "bcsqlserver${random_string.sql_suffix.result}"  # eindeutiger Name durch Suffix
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = var.sql-location
   version                      = "12.0"
@@ -15,6 +17,7 @@ resource "azurerm_mssql_server" "sql_server" {
   administrator_login_password = var.sql_admin_password
 }
 
+# Firewall-Regel: Zugriff für Azure-Dienste erlauben
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   name             = "AllowAzureServices"
   server_id        = azurerm_mssql_server.sql_server.id
@@ -22,13 +25,12 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   end_ip_address   = "0.0.0.0"
 }
 
-# Azure SQL Database
+# Azure SQL-Datenbank (Standard S0, max. 5 GB)
 resource "azurerm_mssql_database" "db" {
-  name           = "bcdb"
-  server_id      = azurerm_mssql_server.sql_server.id
-
-  sku_name       = "S0"
-  max_size_gb    = 5
+  name        = "bcdb"
+  server_id   = azurerm_mssql_server.sql_server.id
+  sku_name    = "S0"   # Leistungsstufe (Standard, klein)
+  max_size_gb = 5
 
   tags = {
     project     = var.project_name
@@ -37,4 +39,3 @@ resource "azurerm_mssql_database" "db" {
     created_by  = "terraform"
   }
 }
-
